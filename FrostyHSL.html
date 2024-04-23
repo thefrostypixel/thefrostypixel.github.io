@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Frosty HSL - Color Picker</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="initial-scale=1">
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <style>
+            @font-face {
+                font-family: "Font";
+                src: url("https://fonts.gstatic.com/s/sourcecodepro/v23/HI_diYsKILxRpg3hIP6sJ7fM7PqPMcMnZFqUwX28DMyQtMlrSlcZZJmOpw.woff") format("woff");
+            }
+
+            body {
+                --color: #000;
+                --outline: #000;
+                --focus: #FFF;
+                background: var(--color);
+                margin: 0;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            .box {
+                background: #0008;
+                border-radius: 30px;
+                width: min(500px, 100vw - 60px);
+                padding: 20px;
+                margin: 100px auto 10px auto;
+            }
+
+            .hex {
+                color: #FFF;
+                background: #0000;
+                border: 2px solid #FFF;
+                border-radius: 10px;
+                width: 144px;
+                height: 80px;
+                padding: 0 min(166px, 50vw - 114px) 0 min(190px, 50vw - 90px);
+                margin: 0 0 20px -2px;
+                font-family: "Font";
+                font-size: 40px;
+            }
+            .hex:focus-visible {
+                outline: none;
+            }
+            button {
+                color: #FFF;
+                background: #0000;
+                border: none;
+                border-radius: 0 10px 10px 0;
+                display: block;
+                position: absolute;
+                height: 84px;
+                padding: 24px;
+                margin: -104px 0 0 min(424px, 100vw - 136px);
+                cursor: pointer;
+            }
+            span {
+                color: #FFF;
+                display: block;
+                position: absolute;
+                margin: -87px 0 0 min(168px, 50vw - 112px);
+                font-family: "Font";
+                font-size: 40px;
+                pointer-events: none;
+            }
+            svg {
+                width: calc(12 * 2.5px);
+                height: calc(14 * 2.5px);
+            }
+
+            .numbers {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                margin: 20px -2 0 -2px;
+            }
+
+            .numbers input {
+                color: #FFF;
+                background: #0000;
+                border: 2px solid #FFF;
+                border-radius: 12px;
+                width: 96px;
+                height: 40px;
+                padding: 20px calc(min(436px, 100vw - 120px) / 6 - 48px);
+                font-family: "Font";
+                font-size: 40px;
+                text-align: left;
+            }
+            .numbers input:first-of-type {
+                width: 72px;
+                padding: 20px calc(min(436px, 100vw - 120px) / 6 - 36px);
+            }
+            .numbers input:focus-visible {
+                outline: none;
+            }
+
+            [type=range] {
+                border: 2px solid #FFF;
+                border-radius: 12px;
+                width: 100%;
+                height: 80px;
+                margin: 20px -2px 0 -2px;
+                cursor: pointer;
+                appearance: none;
+                -webkit-appearance: none;
+            }
+            [type=range]::-webkit-slider-thumb {
+                background: #0000;
+                border-radius: 10px;
+                outline: 2px solid var(--outline);
+                width: 30px;
+                height: 80px;
+                appearance: none;
+                -webkit-appearance: none;
+            }
+            [type=range]::-moz-range-thumb {
+                background: #0000;
+                border-radius: 10px;
+                outline: 2px solid var(--outline);
+                width: 30px;
+                height: 80px;
+            }
+            [type=range]:focus-visible {
+                outline: none;
+            }
+        </style>
+        <div class="box">
+            <input class="hex" type="text"  oninput="this.value = this.value.toUpperCase().replace(/[^0-9A-F]/g, '').substring(0, 6); loadFromHex();" onblur="if (this.value.length == 3) {this.value = this.value[0] + this.value[0] + this.value[1] + this.value[1] + this.value[2] + this.value[2];} else if (this.value.length < 6) {this.value = this.value.padEnd(6, '0');}" tabindex="-1">
+            <span>#</span>
+            <button onclick="navigator.clipboard.writeText('#' + document.querySelector('.hex').value);" tabindex="-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 14">
+                    <path d="M3 2q0 -1 1 -1h6q1 0 1 1v8q0 1 -1 1h-6q-1 0 -1 -1ZM3 3h-1q-1 0 -1 1v8q0 1 1 1h6q1 0 1 -1v-1" fill="none" stroke="#FFF" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div class="numbers">
+                <input class="hue" type="text" value="0" oninput="this.value = Math.min(360, Number(this.value.replace(/[^0-9]+/g, ''))).toString(); document.querySelector('.hue[type=range]').value = this.value; updateDisplay();" tabindex="-1">
+                <input class="saturation" type="text" value="0.5" oninput="let value = this.value.replace(/[^0-9.]+|^0+/g, ''); this.value = Number(value) >= 1 ? '1' : (((value = value.slice(0, value.indexOf('.') + 1) + value.slice(value.indexOf('.') + 1).replace(/\./g, '')).startsWith('.') || value.length == 0 ? '0' : '') + value).slice(0, 4); document.querySelector('.saturation[type=range]').value = Number(this.value); updateDisplay();" onblur="this.value = this.value == '0.' ? '0' : this.value;" tabindex="-1">
+                <input class="lightness" type="text" value="0.5" oninput="let value = this.value.replace(/[^0-9.]+|^0+/g, ''); this.value = Number(value) >= 1 ? '1' : (((value = value.slice(0, value.indexOf('.') + 1) + value.slice(value.indexOf('.') + 1).replace(/\./g, '')).startsWith('.') || value.length == 0 ? '0' : '') + value).slice(0, 4); document.querySelector('.lightness[type=range]').value = Number(this.value); updateDisplay();" onblur="this.value = this.value == '0.' ? '0' : this.value;" tabindex="-1">
+            </div>
+            <input class="hue" type="range" min="0" max="360" value="0" step="1" oninput="document.querySelector('.hue[type=text]').value = this.value; updateDisplay();" tabindex="-1">
+            <input class="saturation" type="range" min="0" max="1" value=".5" step=".01" oninput="document.querySelector('.saturation[type=text]').value = this.value; updateDisplay();" tabindex="-1">
+            <input class="lightness" type="range" min="0" max="1" value=".5" step=".01" oninput="document.querySelector('.lightness[type=text]').value = this.value; updateDisplay();" tabindex="-1">
+        </div>
+        <script>
+            let rgbToLightness = (rgb) => .299 * rgb.r + .587 * rgb.g + .114 * rgb.b;
+            let hueToRgb = (h) => ({r: (h = h % 360 / 60 + (h < 0 ? 6 : 0)) < 1 || h >= 5 ? 1 : h < 2 || h >= 4 ? 1 - Math.abs(h % 2 - 1) : 0, g: h < 1 || (h < 4 && h >= 3) ? 1 - Math.abs(h % 2 - 1) : h < 3 ? 1 : 0, b: h < 2 ? 0 : h < 3 || h >= 5 ? 1 - Math.abs(h % 2 - 1) : 1});
+            let normalizeRgb = (rgb) => {
+                let f = x => (Math.round((x - 10) * (.0299 * rgb.r + .0587 * rgb.g + .0114 * rgb.b + .9) * 594035879.767138 + 5872638707.479901) / 1e9) ** 1.0489734050775022;
+                return {r: f(rgb.r), g: f(rgb.g), b: f(rgb.b)};
+            };
+            let saturateRgb = (rgb, s) => {
+                if (s > .5) {
+                    let a = {r: rgb.r - Math.min(rgb.r, rgb.g, rgb.b), g: rgb.g - Math.min(rgb.r, rgb.g, rgb.b), b: rgb.b - Math.min(rgb.r, rgb.g, rgb.b)};
+                    let b = (s * 2 - 1) / Math.max(a.r, a.g, a.b);
+                    return {r: rgb.r * (s = 2 - s * 2) + a.r * b, g: rgb.g * s + a.g * b, b: rgb.b * s + a.b * b};
+                } else {
+                    return {r: rgb.r * s * 2 + .5 - s, g: rgb.g * s * 2 + .5 - s, b: rgb.b * s * 2 + .5 - s};
+                }
+            };
+            let lightenRgb = (rgb, l) => l > .5 ? {r: rgb.r * (l = 2 - l * 2) + (1 - l), g: rgb.g * l + (1 - l), b: rgb.b * l + (1 - l)} : {r: rgb.r * l * 2, g: rgb.g * l * 2, b: rgb.b * l * 2};
+            let hslToRgb = (h, s, l) => {
+                let rgb = {r: (h = h % 360 / 60 + (h < 0 ? 6 : 0)) < 1 || h >= 5 ? 1 : h < 2 || h >= 4 ? 1 - Math.abs(h % 2 - 1) : 0, g: h < 1 || (h < 4 && h >= 3) ? 1 - Math.abs(h % 2 - 1) : h < 3 ? 1 : 0, b: h < 2 ? 0 : h < 3 || h >= 5 ? 1 - Math.abs(h % 2 - 1) : 1};
+                let f = x => (Math.round((x - 10) * (.0299 * rgb.r + .0587 * rgb.g + .0114 * rgb.b + .9) * 594035879.767138 + 5872638707.479901) / 1e9) ** 1.0489734050775022;
+                rgb = {r: f(rgb.r), g: f(rgb.g), b: f(rgb.b)};
+                if (s > .5) {
+                    let a = {r: rgb.r - Math.min(rgb.r, rgb.g, rgb.b), g: rgb.g - Math.min(rgb.r, rgb.g, rgb.b), b: rgb.b - Math.min(rgb.r, rgb.g, rgb.b)};
+                    let b = (s * 2 - 1) / Math.max(a.r, a.g, a.b);
+                    rgb = {r: rgb.r * (s = 2 - s * 2) + a.r * b, g: rgb.g * s + a.g * b, b: rgb.b * s + a.b * b};
+                } else {
+                    rgb = {r: rgb.r * s * 2 + .5 - s, g: rgb.g * s * 2 + .5 - s, b: rgb.b * s * 2 + .5 - s};
+                }
+                return l > .5 ? {r: rgb.r * (l = 2 - l * 2) + (1 - l), g: rgb.g * l + (1 - l), b: rgb.b * l + (1 - l)} : {r: rgb.r * l * 2, g: rgb.g * l * 2, b: rgb.b * l * 2};
+            };
+
+            let rgbToHsl = (rgb) => {
+                let r = rgb.r;
+                let g = rgb.g;
+                let b = rgb.b;
+
+                console.log(r, g, b);
+
+                let max = Math.max(r, g, b);
+                let min = Math.min(r, g, b);
+                // var h, s, l = (max + min) / 2;
+                let h = 0;
+
+                if (max == min){
+                    h = 0;
+                } else {
+                    var d = max - min;
+                    // s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r:
+                            h = (g - b) / d + (g < b ? 6 : 0);
+                            break;
+                        case g:
+                            h = (b - r) / d + 2;
+                            break;
+                        case b:
+                            h = (r - g) / d + 4;
+                            break;
+                    }
+                    h *= 360;
+                    h /= 6;
+                }
+                let s = 0;
+                let l = 0;
+                /*let max = Math.max(rgb.r, rgb.g, rgb.b);
+                let d = max - Math.min(rgb.r, rgb.g, rgb.b);
+                let h = Math.round(d == 0 ? 0 : (max == rgb.r ? ((rgb.g - rgb.b) / d + (rgb.g < rgb.b ? 6 : 0)) : max == rgb.g ? ((rgb.b - rgb.r) / d + 2) : ((rgb.r - rgb.g) / d + 4)) * 60);
+                let s = 0; // TODO
+                let l = Math.round(rgbToLightness(rgb) * 100) / 100; // TODO Not working properly either*/
+                return {h, s, l};
+            };
+
+            let rgbToStr = (rgb) => ("#" + Math.round(rgb.r * 255).toString(16).padStart(2, "0") + Math.round(rgb.g * 255).toString(16).padStart(2, "0") + Math.round(rgb.b * 255).toString(16).padStart(2, "0")).toUpperCase();
+            let strToRgb = (str) => ({r: parseInt(str.slice(0, 2), 16) / 255, g: parseInt(str.slice(2, 4), 16) / 255, b: parseInt(str.slice(4, 6), 16) / 255});
+
+            let loadFromHex = () => {
+                str = document.querySelector(".hex").value;
+                if (str.length == 3) {
+                    str = str[0] + str[0] + str[1] + str[1] + str[2] + str[2];
+                } else if (str.length < 6) {
+                    str = str.padEnd(6, "0");
+                }
+                let hsl = rgbToHsl(strToRgb(str));
+                document.querySelector(".hue[type=text]").value = hsl.h;
+                document.querySelector(".saturation[type=text]").value = hsl.s;
+                document.querySelector(".lightness[type=text]").value = hsl.l;
+                document.querySelector(".hue[type=range]").value = hsl.h;
+                document.querySelector(".saturation[type=range]").value = hsl.s;
+                document.querySelector(".lightness[type=range]").value = hsl.l;
+                updateDisplay(false);
+            };
+
+            let updateDisplay = (updateHex = true) => {
+                let h = Number(document.querySelector(".hue[type=text]").value);
+                let s = Number(document.querySelector(".saturation[type=text]").value);
+                let l = Number(document.querySelector(".lightness[type=text]").value);
+                let hueStr = "";
+                let satStr = "";
+                let lightStr = "";
+                let stepSize = .01;
+
+                // let min = Infinity;
+                // let max = 0;
+                // let minL = Infinity;
+                // let maxL = 0;
+
+                for (let i = 0; i < 1 + stepSize; i += stepSize) {
+                    hueStr += "," + rgbToStr(hslToRgb(i * 360, s, l));
+                    satStr += "," + rgbToStr(hslToRgb(h, i, l));
+                    lightStr += "," + rgbToStr(hslToRgb(h, s, i));
+
+                    // min = Math.min(min, normalizeRgb(hueToRgb(i * 360)).r, normalizeRgb(hueToRgb(i * 360)).g, normalizeRgb(hueToRgb(i * 360)).b);
+                    // max = Math.max(max, normalizeRgb(hueToRgb(i * 360)).r, normalizeRgb(hueToRgb(i * 360)).g, normalizeRgb(hueToRgb(i * 360)).b);
+                    // minL = Math.min(minL, rgbToLightness(normalizeRgb(hueToRgb(i * 360))));
+                    // maxL = Math.max(maxL, rgbToLightness(normalizeRgb(hueToRgb(i * 360))));
+                }
+                // console.log("Minimum (0):            " + min.toFixed(2) + "\nMinimum Lightness (.5): " + minL.toFixed(2) + "\nMaximum Lightness (.5): " + maxL.toFixed(2) + "\nMaximum (1):            " + max.toFixed(2));
+                document.querySelector(".hue[type=range]").setAttribute("style", "background-image:linear-gradient(to right" + hueStr + ")");
+                document.querySelector(".saturation[type=range]").setAttribute("style", "background-image:linear-gradient(to right" + satStr + ")");
+                document.querySelector(".lightness[type=range]").setAttribute("style", "background-image:linear-gradient(to right" + lightStr + ")");
+                if (updateHex) {
+                    document.querySelector(".hex").value = rgbToStr(hslToRgb(h, s, l)).slice(1);
+                }
+                document.body.style = "--color: " + rgbToStr(hslToRgb(h, s, l)) + "; --outline: " + rgbToStr(hslToRgb(h + 180, Math.min(1, Math.max(0, 1.5 - s * 2)), Math.min(1, Math.max(0, 1 - l))));
+
+                /*console.log("0   -> " + Math.round(rgbToHsl(hslToRgb(h, 0, l)).s * 1e4) / 1e4);
+                console.log("0.5 -> " + Math.round(rgbToHsl(hslToRgb(h, .5, l)).s * 1e4) / 1e4);
+                console.log("1   -> " + Math.round(rgbToHsl(hslToRgb(h, 1, l)).s * 1e4) / 1e4);
+                console.log("1.5 -> " + Math.round(rgbToHsl(hslToRgb(h, 1.5, l)).s * 1e4) / 1e4);
+                console.log("2   -> " + Math.round(rgbToHsl(hslToRgb(h, 2, l)).s * 1e4) / 1e4);*/
+            }
+            updateDisplay();
+
+            let applyFhslToStyles = () => {
+                for (let e of document.querySelectorAll("style")) {
+                    e.innerText = e.innerText.replace(/fhsl\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, (match, h, s, l) => rgbToStr(hslToRgb(parseFloat(h), parseFloat(s), parseFloat(l))));
+                }
+            };
+            let applyFhslToInlineStyles = () => {
+                for (let e of document.querySelectorAll("[style]")) {
+                    if (e.getAttribute("style").includes("fhsl(")) {
+                        e.setAttribute("style", e.getAttribute("style").replace(/fhsl\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, (match, h, s, l) => rgbToStr(hslToRgb(parseFloat(h), parseFloat(s), parseFloat(l)))));
+                    }
+                }
+            };
+        </script>
+    </body>
+</html>

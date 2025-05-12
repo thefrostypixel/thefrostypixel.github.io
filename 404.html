@@ -1,0 +1,25 @@
+<script>
+  let path = window.location.pathname.split("/");
+  p = path[1].toLowerCase();
+  if (p == "frostyhsl" || p == "hsl") {
+    p = "FrostyHSL";
+  } else if (p == "url-encoder" || p == "urlencoder" || p == "url") {
+    p = "URL-Encoder";
+  } else if (p == "totp-auth" || p == "totpauth" || p == "totp" || p == "auth") {
+    p = "TOTPAuto";
+  } else if (p == "vocab") {
+    p = "Vocab";
+  } else if (p == "impostor" || p == "sus") {
+    p = "Impostor";
+  } else if (p == "presentation" || p == "pres") {
+    p = "Presentation";
+  } else if (p == "old-game" || p == "oldgame" || p == "old") {
+    p = "OldGame";
+  } else if (p == "new-game" || p == "newgame" || p == "new") {
+    p = "NewGame";
+  }
+  if (p.toLowerCase() != path[1].toLowerCase()) {
+    path[1] = p;
+    window.location = path.join("/");
+  }
+</script>

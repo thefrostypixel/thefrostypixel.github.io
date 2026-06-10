@@ -1,25 +1,17 @@
 <script>
   let path = window.location.pathname.split("/");
-  p = path[1].toLowerCase();
-  if (p == "frostyhsl" || p == "hsl") {
-    p = "FrostyHSL";
-  } else if (p == "url-encoder" || p == "urlencoder" || p == "url") {
-    p = "URL-Encoder";
-  } else if (p == "totp-auth" || p == "totpauth" || p == "totp" || p == "auth") {
-    p = "TOTPAuth";
-  } else if (p == "view-video" || p == "view-vid" || p == "viewvideo" || p == "viewvid" || p == "vid") {
-    p = "ViewVideo";
-  } else if (p == "vocab") {
-    p = "Vocab";
-  } else if (p == "impostor" || p == "sus") {
-    p = "Impostor";
-  } else if (p == "presentation" || p == "pres") {
-    p = "Presentation";
-  } else if (p == "old-game" || p == "oldgame" || p == "old") {
-    p = "OldGame";
-  } else if (p == "new-game" || p == "newgame" || p == "new") {
-    p = "NewGame";
-  }
+  let p = [
+    ["Font-Installer", /font(-?inst(aller)?)?/i],
+    ["Random-Text", /ra?n?do?m(-?te?xt)?|te?xt/i],
+    ["ViewVideo", /(view-?)?vid(eo)?/i],
+    ["Impostor", /impostor|sus/i],
+    ["FrostyHSL", /(frosty-?)?hsl/i],
+    ["Vocab", /vocab(ulary)?/i],
+    ["URL-Encoder", /url(-?enc(oder)?)?/i],
+    ["NewGame", /new(-?game)?/i],
+    ["TOTPAuth", /totp(-?auth)?|auth/i],
+    ["OldGame", /old(-?game)?/i],
+  ].find(([name, regex]) => regex.test(path[1]))?.[0] || path[1];
   if (p.toLowerCase() != path[1].toLowerCase()) {
     path[1] = p;
     window.location = path.join("/");

@@ -6,12 +6,9 @@
     ["ViewVideo", /(view-?)?vid(eo)?/i],
     ["Impostor", /impostor|sus/i],
     ["FrostyHSL", /(frosty-?)?hsl/i],
-    ["Vocab", /vocab(ulary)?/i],
     ["URL-Encoder", /url(-?enc(oder)?)?/i],
-    ["NewGame", /new(-?game)?/i],
     ["TOTPAuth", /totp(-?auth)?|auth/i],
-    ["OldGame", /old(-?game)?/i],
-  ].find(([name, regex]) => regex.test(path[1]))?.[0] || path[1];
+  ].find(([_, regex]) => regex.test(path[1]))?.[0] || path[1];
   if (p.toLowerCase() != path[1].toLowerCase()) {
     path[1] = p;
     window.location = path.join("/");
